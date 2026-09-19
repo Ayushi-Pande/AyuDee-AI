@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+:root {
+  --focus-ring: 3px solid #20b7d8;
+  --primary-navy: #062a45;
+  --deep-navy: #041f33;
+  --medical-blue: #087ea4;
+  --bright-blue: #20b7d8;
+  --sky: #ddf7f5;
+  --light-blue: #edf8fc;
+  --ice: #edf8fc;
+  --white: #ffffff;
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --success: #15803d;
+  --warning: #f59e0b;
+  --danger: #b91c1c;
+  --card-shadow: 0 14px 34px rgba(4, 31, 51, 0.1);
+}
+
+* {
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--light-blue);
+  min-height: 100%;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(32, 183, 216, 0.14), transparent 25rem),
+    radial-gradient(circle at 92% 88%, rgba(20, 184, 166, 0.1), transparent 30rem),
+    var(--light-blue);
+  color: var(--text-primary);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  line-height: 1.5;
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+body.high-contrast {
+  filter: contrast(1.2) saturate(1.1);
+}
+
+body.large-text {
+  font-size: 108%;
+}
+
+body.simple-mode .app-content > div > :nth-child(n+3),
+body.simple-mode .app-content > section:nth-child(n+3) {
+  display: none;
+}
+
+body.simple-mode button,
+body.simple-mode a {
+  min-height: 44px;
+}
+
+body.reduced-motion *,
+body.reduced-motion *::before,
+body.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.app-shell-shadow {
+  box-shadow: var(--card-shadow);
+}
+
+.medical-card {
+  background: var(--white);
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--card-shadow);
+}
+
+.app-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.74), transparent 44%),
+    radial-gradient(circle at 80% 4%, rgba(32, 183, 216, 0.11), transparent 22rem),
+    var(--light-blue);
+}
+
+.app-content {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 32px clamp(20px, 4vw, 64px) 72px;
+}
+
+.premium-card {
+  border: 1px solid rgba(8, 126, 164, 0.14);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--card-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.premium-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(32, 183, 216, 0.38);
+  box-shadow: 0 20px 42px rgba(4, 31, 51, 0.14);
+}
+
+.neural-grid {
+  background-image: radial-gradient(rgba(32, 183, 216, 0.25) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 24px 24px, 100% 100%;
+}
+
+/* Keep legacy pages inside the new AyuDee palette while their feature logic remains intact. */
+.border-violet-100 { border-color: rgba(8, 126, 164, 0.14); }
+.border-violet-200 { border-color: rgba(32, 183, 216, 0.32); }
+.bg-violet-50 { background-color: #edf8fc; }
+.bg-violet-100 { background-color: #ddf7f5; }
+.text-violet-600, .text-violet-700, .text-violet-800 { color: #087ea4; }
+.bg-violet-600 { background-color: #087ea4; }
+.bg-violet-700 { background-color: #062a45; }
+.hover\:bg-violet-100:hover { background-color: #ddf7f5; }
+.hover\:bg-violet-700:hover { background-color: #062a45; }
+
+.medical-btn-primary {
+  background: var(--primary-navy);
+  color: white;
+  border: 0;
+  box-shadow: 0 12px 24px rgba(47, 128, 237, 0.24);
+}
+
+.medical-btn-secondary {
+  background: rgba(20, 108, 148, 0.08);
+  color: var(--medical-blue);
+  border: 1px solid rgba(20, 108, 148, 0.15);
+}
+
+.medical-shell {
+  background: var(--light-blue);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-navy), var(--bright-blue), var(--sky));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
