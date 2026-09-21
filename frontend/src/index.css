@@ -125,6 +125,37 @@ body.reduced-motion *::after {
   padding: 32px clamp(20px, 4vw, 64px) 72px;
 }
 
+.startup-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(145deg, #041f33 0%, #073b66 56%, #087ea4 100%);
+  color: white;
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.startup-splash-visible { opacity: 1; visibility: visible; }
+.startup-splash-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.startup-app-hidden { visibility: hidden; }
+.startup-app-visible { visibility: visible; }
+.startup-splash-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image: radial-gradient(rgba(139, 230, 242, 0.55) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.startup-splash-content { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; animation: splash-rise 900ms ease both; }
+.startup-splash-mark { transform: scale(1.18); filter: drop-shadow(0 12px 28px rgba(32, 183, 216, 0.24)); }
+.startup-splash-kicker { margin-top: 34px; color: #a7f3d0; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.24em; text-transform: uppercase; }
+.startup-splash h1 { margin: 10px 0 0; font-size: clamp(2.8rem, 8vw, 5.5rem); font-weight: 900; letter-spacing: -0.04em; }
+.startup-splash-content > p:last-child { margin-top: 10px; color: #d9f6fb; font-size: clamp(1rem, 2.8vw, 1.4rem); font-weight: 600; }
+@keyframes splash-rise { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .startup-splash-content { animation: none; } .startup-splash { transition: none; } }
+
 .premium-card {
   border: 1px solid rgba(8, 126, 164, 0.14);
   border-radius: 22px;
@@ -177,4 +208,72 @@ body.reduced-motion *::after {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Targeted landing and patient dashboard polish for the active AyuDee-AI app. */
+.landing-actual {
+  background:
+    radial-gradient(circle at 80% 25%, rgba(42, 207, 199, 0.32), transparent 32%),
+    radial-gradient(circle at 15% 75%, rgba(47, 128, 237, 0.18), transparent 34%),
+    linear-gradient(135deg, #f2fcfa 0%, #ddf5f2 48%, #e4f1fb 100%);
+}
+
+.landing-actual-hero {
+  isolation: isolate;
+  background: transparent;
+}
+
+.landing-actual-hero::before,
+.landing-actual-hero::after {
+  position: absolute;
+  z-index: -1;
+  border-radius: 999px;
+  filter: blur(55px);
+  content: "";
+  pointer-events: none;
+}
+
+.landing-actual-hero::before {
+  top: 4rem;
+  right: 7%;
+  width: 28rem;
+  height: 28rem;
+  background: rgba(42, 207, 199, 0.22);
+}
+
+.landing-actual-hero::after {
+  bottom: 1rem;
+  left: 5%;
+  width: 24rem;
+  height: 24rem;
+  background: rgba(47, 128, 237, 0.12);
+}
+
+.landing-hero-copy { animation: landing-copy-enter 700ms ease both; }
+.landing-actual-headline { font-size: clamp(3.5rem, 6vw, 6.5rem); line-height: 0.98; letter-spacing: -0.04em; color: #071c2c; }
+.landing-actual-headline span { display: block; }
+.landing-gradient-words { position: relative; width: fit-content; background: linear-gradient(100deg, #0a6f7e, #13b8b2 48%, #2f80ed); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.landing-gradient-words::after { position: absolute; z-index: -1; inset: 30% -5% -8%; border-radius: 50%; background: rgba(89, 221, 212, 0.25); filter: blur(28px); content: ""; }
+.landing-primary { background: linear-gradient(135deg, #0a6f7e, #13b8b2 55%, #2f80ed); box-shadow: 0 14px 28px rgba(10, 111, 126, 0.25); }
+.landing-primary:hover { box-shadow: 0 18px 34px rgba(10, 111, 126, 0.32); }
+.landing-secondary { border: 1px solid rgba(19, 184, 178, 0.42); background: rgba(255, 255, 255, 0.62); color: #071c2c; backdrop-filter: blur(12px); }
+.landing-secondary:hover { background: rgba(255, 255, 255, 0.9); }
+.landing-image-card { border: 1px solid rgba(19, 184, 178, 0.3); border-radius: 26px; box-shadow: 0 30px 80px rgba(7, 28, 44, 0.2); }
+.landing-image-card:hover { box-shadow: 0 38px 90px rgba(7, 28, 44, 0.28); }
+
+.app-page { background: linear-gradient(135deg, #effaf8 0%, #e4f5f3 48%, #eaf3fa 100%); }
+.app-content > .space-y-7 > section:first-child { position: relative; border-radius: 24px; background: linear-gradient(135deg, #061b2b 0%, #0b4562 48%, #078c8a 100%) !important; box-shadow: 0 24px 52px rgba(7, 28, 44, 0.22) !important; }
+.app-content > .space-y-7 > section:first-child::after { position: absolute; top: -6rem; right: 13%; width: 20rem; height: 20rem; border: 35px solid rgba(89, 221, 212, 0.13); border-radius: 50%; content: ""; pointer-events: none; }
+.app-content > .space-y-7 > section:first-child > div { position: relative; z-index: 1; }
+.app-content > .space-y-7 > section:first-child > div > div:last-child > div { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+.premium-card { border-color: rgba(13, 148, 136, 0.16); border-radius: 20px; background: rgba(255, 255, 255, 0.9); box-shadow: 0 12px 35px rgba(7, 28, 44, 0.09); }
+.premium-card:hover { transform: translateY(-3px); }
+.patient-sidebar-visual { background: linear-gradient(180deg, #061a2a 0%, #082c43 60%, #064d59 100%); }
+.patient-sidebar-visual a[aria-current="page"] { background: linear-gradient(90deg, #17c9c3, #42dad2); color: #061a2a; box-shadow: 0 8px 22px rgba(66, 218, 210, 0.3); }
+@keyframes landing-copy-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 640px) {
+  .landing-actual-headline { font-size: clamp(3rem, 15vw, 5rem); }
+  .landing-actual-hero::before { right: -10rem; }
+  .landing-actual-hero::after { left: -9rem; }
 }

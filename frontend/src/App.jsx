@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AppSettingsProvider } from "./context/AppSettingsContext";
 import { AuthProvider } from "./context/AuthContext";
+import { LanguageProvider } from "./context/LanguageContext";
+import { AppLockProvider } from "./context/AppLockContext";
+import StartupSplash from "./components/common/StartupSplash";
 import Landing from "./pages/Landing";
 import ChooseRole from "./pages/ChooseRole";
 import Login from "./pages/Login";
@@ -16,7 +19,9 @@ import PatientGames from "./pages/patient/Games";
 import PatientReminders from "./pages/patient/Reminders";
 import PatientCompanion from "./pages/patient/Companion";
 import PatientHelp from "./pages/patient/Help";
-import PatientToday from "./pages/patient/Today";
+import DailyPlanner from "./pages/patient/DailyPlanner";
+import PatientMood from "./pages/patient/Mood";
+import PatientConnections from "./pages/patient/Connections";
 
 // Caregiver Pages
 import CaregiverDashboard from "./pages/caregiver/Dashboard";
@@ -28,10 +33,13 @@ import CaregiverConnect from "./pages/caregiver/Connect";
 
 function App() {
   return (
-    <AuthProvider>
-      <AppSettingsProvider>
-        <BrowserRouter>
-          <Routes>
+    <BrowserRouter>
+      <StartupSplash>
+        <AuthProvider>
+          <AppSettingsProvider>
+            <LanguageProvider>
+              <AppLockProvider>
+            <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/choose-role" element={<ChooseRole />} />
             <Route path="/login" element={<Login />} />
@@ -44,7 +52,10 @@ function App() {
             <Route path="/patient/reminders" element={<PatientReminders />} />
             <Route path="/patient/companion" element={<PatientCompanion />} />
             <Route path="/patient/help" element={<PatientHelp />} />
-            <Route path="/patient/today" element={<PatientToday />} />
+            <Route path="/patient/today" element={<DailyPlanner />} />
+            <Route path="/patient/mood" element={<PatientMood />} />
+            <Route path="/patient/family" element={<PatientConnections />} />
+            <Route path="/patient/consultations" element={<PatientConnections appointmentsOnly />} />
             <Route path="/patient/profile" element={<Profile role="PATIENT" />} />
             <Route path="/patient/progress" element={<PatientGames />} />
 
@@ -61,10 +72,13 @@ function App() {
             <Route path="/caregiver/activity" element={<CaregiverGames />} />
 
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AppSettingsProvider>
-    </AuthProvider>
+            </Routes>
+              </AppLockProvider>
+            </LanguageProvider>
+          </AppSettingsProvider>
+        </AuthProvider>
+      </StartupSplash>
+    </BrowserRouter>
   );
 }
 

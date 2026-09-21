@@ -88,7 +88,7 @@ const steps = [
 
 export default function Landing() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#F4FAFD] text-[#0B2945]">
+    <main className="landing-actual min-h-screen overflow-hidden text-[#0B2945]">
 
       {/* =========================
           NAVBAR
@@ -160,7 +160,7 @@ export default function Landing() {
           HERO SECTION
       ========================== */}
 
-      <section className="relative">
+      <section className="landing-actual-hero relative">
 
         {/* Background decoration */}
 
@@ -172,29 +172,20 @@ export default function Landing() {
 
           {/* LEFT HERO */}
 
-          <div>
+          <div className="landing-hero-copy">
 
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#BCE8EF] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#087FC4] shadow-sm">
               <Sparkles size={15} />
               AI-Powered Cognitive Care
             </div>
 
-            <h1 className="max-w-2xl text-5xl font-black leading-[1.02] tracking-tight text-[#062A4D] sm:text-6xl lg:text-7xl">
-
-              Care that{" "}
-
-              <span className="text-[#18BCE0]">
-                remembers
-              </span>
-
-              {" "}with you.
-
+            <h1 className="landing-actual-headline max-w-2xl font-black">
+              <span>Where Help</span>
+              <span className="landing-gradient-words">Meets Care</span>
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-8 text-[#64748B]">
-              AyuDee AI is a compassionate cognitive care platform that
-              helps people preserve memories, manage everyday routines,
-              stay mentally engaged and remain connected with caregivers.
+              Memories, routines, brain activities and the people you love — together in one supportive space.
             </p>
 
             {/* Hero Buttons */}
@@ -203,15 +194,15 @@ export default function Landing() {
 
               <Link
                 to="/choose-role"
-                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#087FC4] px-6 py-3 font-black text-white shadow-lg shadow-[#087FC4]/20 transition hover:-translate-y-1 hover:bg-[#062A4D]"
+                className="landing-primary inline-flex min-h-12 items-center gap-2 rounded-xl px-6 py-3 font-black text-white transition hover:-translate-y-1"
               >
                 Choose your journey
                 <ArrowRight size={18} />
               </Link>
 
               <Link
-                to="/patient"
-                className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-[#B9DCE8] bg-white px-6 py-3 font-black text-[#062A4D] shadow-sm transition hover:-translate-y-1 hover:border-[#18BCE0] hover:shadow-lg"
+                to="/choose-role"
+                className="landing-secondary inline-flex min-h-12 items-center gap-2 rounded-xl px-6 py-3 font-black transition hover:-translate-y-1"
               >
                 Explore demo
                 <Sparkles size={17} />
@@ -266,7 +257,7 @@ export default function Landing() {
 
               {/* PATIENT IMAGE CARD */}
 
-              <div className="translate-y-8 overflow-hidden rounded-[32px] border border-white/80 bg-white p-3 shadow-[0_30px_80px_rgba(7,59,102,0.18)] transition duration-300 hover:-translate-y-1">
+              <div className="landing-image-card translate-y-8 overflow-hidden rounded-[32px] bg-white p-3 transition duration-300 hover:-translate-y-1">
 
                 <div className="relative h-[320px] overflow-hidden rounded-[25px]">
 
@@ -324,7 +315,7 @@ export default function Landing() {
 
               {/* FAMILY IMAGE CARD */}
 
-              <div className="overflow-hidden rounded-[32px] bg-gradient-to-br from-[#062A4D] to-[#087FC4] p-3 text-white shadow-[0_30px_80px_rgba(7,59,102,0.25)] transition duration-300 hover:-translate-y-2">
+              <div className="landing-image-card overflow-hidden rounded-[32px] bg-gradient-to-br from-[#062A4D] to-[#087FC4] p-3 text-white transition duration-300 hover:-translate-y-2">
 
                 <div className="relative h-[320px] overflow-hidden rounded-[25px]">
 

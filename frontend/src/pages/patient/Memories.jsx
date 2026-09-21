@@ -1,4 +1,4 @@
-import { Heart, ImageIcon, PencilLine, Plus, Search, Trash2, X } from "lucide-react";
+import { Heart, ImageIcon, PencilLine, Plus, Search, Trash2, Volume2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import PatientLayout from "../../components/common/PatientLayout";
 import SectionHeader from "../../components/common/SectionHeader";
@@ -13,8 +13,9 @@ export default function PatientMemories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [viewingMemory, setViewingMemory] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ title: "", description: "", person: "", relationship: "", date: "", label: "Familiar" });
+  const [form, setForm] = useState({ title: "", description: "", person: "", relationship: "", date: "", label: "Familiar", image: "" });
   const [search, setSearch] = useState("");
   const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem("ayudee-memory-favorites") || "[]"));
 
@@ -46,7 +47,7 @@ export default function PatientMemories() {
   }, []);
 
   const resetEditor = () => {
-    setForm({ title: "", description: "", person: "", relationship: "", date: "", label: "Familiar" });
+    setForm({ title: "", description: "", person: "", relationship: "", date: "", label: "Familiar", image: "" });
     setEditingId(null);
     setIsEditorOpen(false);
   };
@@ -54,7 +55,7 @@ export default function PatientMemories() {
   const openEditor = (memory = null) => {
     if (memory) {
       setEditingId(memory.id);
-      setForm({ title: memory.title || "", description: memory.description || "", person: memory.person || "", relationship: memory.relationship || "", date: memory.date || "", label: memory.label || "Familiar" });
+      setForm({ title: memory.title || "", description: memory.description || "", person: memory.person || "", relationship: memory.relationship || "", date: memory.date || "", label: memory.label || "Familiar", image: memory.image || "" });
     }
     setIsEditorOpen(true);
   };
@@ -71,6 +72,26 @@ export default function PatientMemories() {
       setMemories((current) => { const next = [response?.data || fallback, ...current]; localStorage.setItem("ayudee-patient-memories", JSON.stringify(next)); return next; });
     }
     resetEditor();
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) {
+      setError("Please choose an image smaller than 2 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setForm((current) => ({ ...current, image: reader.result }));
+    reader.readAsDataURL(file);
+  };
+
+  const readMemory = (memory) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(`${memory.title}. ${memory.description}`);
+    utterance.lang = localStorage.getItem("ayudee-language") === "hi" ? "hi-IN" : "en-IN";
+    window.speechSynthesis.speak(utterance);
   };
 
   const deleteMemory = async (memoryId) => {
@@ -99,12 +120,12 @@ export default function PatientMemories() {
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {visibleMemories.map((memory) => (
                 <article key={memory.id || memory.title} className="overflow-hidden rounded-[28px] border border-violet-100 bg-[#fffdf7] shadow-sm">
-                  <div className="flex h-40 items-center justify-center bg-gradient-to-br from-[#fdf6e8] via-[#f5f3ff] to-[#fff] text-slate-500">
-                    <ImageIcon size={36} />
+                  <div className="flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-[#fdf6e8] via-[#f5f3ff] to-[#fff] text-slate-500">
+                    {memory.image ? <img src={memory.image} alt="" className="h-full w-full object-cover" /> : <ImageIcon size={36} />}
                   </div>
                   <div className="space-y-3 p-5">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-xl font-bold text-slate-800">{memory.title}</h3>
+                      <button type="button" onClick={() => setViewingMemory(memory)} className="text-left text-xl font-bold text-slate-800 hover:text-[#087EA4]">{memory.title}</button>
                       <StatusBadge status={memory.label || "Familiar"} variant="soft" />
                     </div>
                     <p className="text-sm leading-6 text-slate-600">{memory.description}</p>
@@ -116,6 +137,7 @@ export default function PatientMemories() {
                       <span>{memory.date || "Recent"}</span>
                       <div className="flex items-center gap-2 text-slate-600">
                         <button type="button" onClick={() => toggleFavorite(memory.id)} aria-label={`Favorite memory ${memory.title}`} className={`rounded-full p-2 ${favorites.includes(memory.id) ? "bg-rose-100 text-rose-600" : "hover:bg-rose-50"}`}><Heart size={16} fill={favorites.includes(memory.id) ? "currentColor" : "none"} /></button>
+                        <button type="button" onClick={() => readMemory(memory)} aria-label={`Read memory ${memory.title}`} className="rounded-full p-2 hover:bg-cyan-100"><Volume2 size={16} /></button>
                         <button type="button" onClick={() => openEditor(memory)} aria-label={`Edit memory ${memory.title}`} className="rounded-full p-2 hover:bg-cyan-100"><PencilLine size={16} /></button>
                         <button type="button" onClick={() => deleteMemory(memory.id)} aria-label={`Delete memory ${memory.title}`} className="rounded-full p-2 hover:bg-rose-100"><Trash2 size={16} /></button>
                       </div>
@@ -138,11 +160,14 @@ export default function PatientMemories() {
                 <textarea required value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} placeholder="What makes this moment meaningful?" rows="4" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" />
                 <div className="grid gap-4 sm:grid-cols-2"><input required value={form.person} onChange={(event) => setForm({ ...form, person: event.target.value })} placeholder="Person or place" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" /><input required value={form.relationship} onChange={(event) => setForm({ ...form, relationship: event.target.value })} placeholder="Category or relationship" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" /></div>
                 <div className="grid gap-4 sm:grid-cols-2"><input required type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" /><select value={form.label} onChange={(event) => setForm({ ...form, label: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400"><option>Familiar</option><option>Joyful</option><option>Comforting</option></select></div>
+                <label className="block rounded-xl border border-dashed border-cyan-200 bg-cyan-50/50 p-4 text-sm font-semibold text-[#087EA4]">Photo (optional, max 2 MB)<input type="file" accept="image/*" onChange={handleImageChange} className="mt-2 block w-full text-sm text-slate-600" />{form.image ? <img src={form.image} alt="Memory preview" className="mt-3 h-28 w-full rounded-xl object-cover" /> : null}</label>
               </div>
               <div className="mt-6 flex justify-end gap-3"><button type="button" onClick={resetEditor} className="rounded-xl border border-slate-200 px-4 py-3 font-bold text-slate-600">Cancel</button><button className="rounded-xl bg-[#082F49] px-5 py-3 font-bold text-white">{editingId ? "Save changes" : "Add memory"}</button></div>
             </form>
           </div>
         ) : null}
+
+        {viewingMemory ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#082F49]/50 p-4" role="dialog" aria-modal="true" aria-labelledby="memory-detail-title"><div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0369A1]">Memory Vault</p><h2 id="memory-detail-title" className="mt-1 text-3xl font-black text-[#082F49]">{viewingMemory.title}</h2></div><button type="button" onClick={() => setViewingMemory(null)} aria-label="Close memory" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X size={20} /></button></div>{viewingMemory.image ? <img src={viewingMemory.image} alt="" className="mt-5 max-h-80 w-full rounded-2xl object-cover" /> : <div className="mt-5 flex h-48 items-center justify-center rounded-2xl bg-[#f8f5ff] text-slate-400"><ImageIcon size={42} /></div>}<p className="mt-5 text-base leading-7 text-slate-700">{viewingMemory.description}</p><div className="mt-4 grid gap-3 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 sm:grid-cols-3"><p><strong className="block text-slate-800">Person</strong>{viewingMemory.person || "Family member"}</p><p><strong className="block text-slate-800">Relationship</strong>{viewingMemory.relationship || "Loved one"}</p><p><strong className="block text-slate-800">Date</strong>{viewingMemory.date || "Recent"}</p></div><button type="button" onClick={() => readMemory(viewingMemory)} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#082F49] px-4 py-3 font-bold text-white"><Volume2 size={17} /> Read memory</button></div></div> : null}
       </div>
     </PatientLayout>
   );

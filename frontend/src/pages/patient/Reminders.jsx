@@ -54,7 +54,17 @@ export default function PatientReminders() {
     }
     resetEditor();
   };
-  const deleteReminder = async (id) => { await apiService.deleteReminder(id).catch(() => undefined); setReminders((current) => { const next = current.filter((item) => item.id !== id); localStorage.setItem("ayudee-patient-reminders", JSON.stringify(next)); return next; }); };
+  const deleteReminder = async (id) => {
+    if (!window.confirm("Delete this reminder?")) return;
+    await apiService.deleteReminder(id).catch(() => undefined);
+    setReminders((current) => { const next = current.filter((item) => item.id !== id); localStorage.setItem("ayudee-patient-reminders", JSON.stringify(next)); return next; });
+  };
+
+  const toggleReminder = async (reminder) => {
+    const status = reminder.status === "completed" ? "upcoming" : "completed";
+    await apiService.updateReminderStatus(reminder.id, status).catch(() => undefined);
+    setReminders((current) => { const next = current.map((item) => item.id === reminder.id ? { ...item, status } : item); localStorage.setItem("ayudee-patient-reminders", JSON.stringify(next)); return next; });
+  };
 
   const filteredReminders = useMemo(() => {
     return reminders.filter((reminder) => {
@@ -86,6 +96,9 @@ export default function PatientReminders() {
                 <option value="appointment">Appointment</option>
                 <option value="meal">Meal</option>
                 <option value="activity">Activity</option>
+                <option value="hydration">Hydration</option>
+                <option value="social">Social / Family</option>
+                <option value="brain">Brain Activity</option>
               </select>
             </div>
 
@@ -119,7 +132,7 @@ export default function PatientReminders() {
                     <button type="button" onClick={() => deleteReminder(reminder.id)} aria-label={`Delete reminder ${reminder.title}`} className="rounded-full border border-rose-200 bg-rose-50 p-2 text-rose-600"><Trash2 size={16} /></button>
                     <button
                       type="button"
-                      onClick={() => setReminders((current) => { const next = current.map((item) => item.id === reminder.id ? { ...item, status: item.status === "completed" ? "upcoming" : "completed" } : item); localStorage.setItem("ayudee-patient-reminders", JSON.stringify(next)); return next; })}
+                      onClick={() => toggleReminder(reminder)}
                       className="inline-flex items-center gap-2 rounded-full bg-[#082F49] px-4 py-2 text-sm font-semibold text-white"
                     >
                       <CheckCircle2 size={16} />
@@ -134,7 +147,7 @@ export default function PatientReminders() {
           )}
         </div>
 
-        {isEditorOpen ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#082F49]/50 p-4" role="dialog" aria-modal="true" aria-label="Reminder editor"><form onSubmit={saveReminder} className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0369A1]">Daily routine</p><h2 className="mt-1 text-2xl font-black text-[#082F49]">{editingId ? "Edit reminder" : "Add a reminder"}</h2></div><button type="button" onClick={resetEditor} aria-label="Close reminder editor" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X size={20} /></button></div><div className="mt-5 space-y-4"><input required value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Reminder title" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" /><div className="grid gap-4 sm:grid-cols-2"><select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400"><option value="medication">Medication</option><option value="appointment">Appointment</option><option value="meal">Meal</option><option value="activity">Activity</option><option value="other">Other</option></select><input required type="time" value={form.time} onChange={(event) => setForm({ ...form, time: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" /></div></div><div className="mt-6 flex justify-end gap-3"><button type="button" onClick={resetEditor} className="rounded-xl border border-slate-200 px-4 py-3 font-bold text-slate-600">Cancel</button><button className="rounded-xl bg-[#082F49] px-5 py-3 font-bold text-white">{editingId ? "Save changes" : "Add reminder"}</button></div></form></div> : null}
+        {isEditorOpen ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#082F49]/50 p-4" role="dialog" aria-modal="true" aria-label="Reminder editor"><form onSubmit={saveReminder} className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0369A1]">Daily routine</p><h2 className="mt-1 text-2xl font-black text-[#082F49]">{editingId ? "Edit reminder" : "Add a reminder"}</h2></div><button type="button" onClick={resetEditor} aria-label="Close reminder editor" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X size={20} /></button></div><div className="mt-5 space-y-4"><input required value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Reminder title" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" /><div className="grid gap-4 sm:grid-cols-2"><select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400"><option value="medication">Medication</option><option value="hydration">Hydration</option><option value="appointment">Appointment</option><option value="meal">Meal</option><option value="activity">Exercise</option><option value="social">Social / Family</option><option value="brain">Brain Activity</option><option value="other">Other</option></select><input required type="time" value={form.time} onChange={(event) => setForm({ ...form, time: event.target.value })} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-400" /></div></div><div className="mt-6 flex justify-end gap-3"><button type="button" onClick={resetEditor} className="rounded-xl border border-slate-200 px-4 py-3 font-bold text-slate-600">Cancel</button><button className="rounded-xl bg-[#082F49] px-5 py-3 font-bold text-white">{editingId ? "Save changes" : "Add reminder"}</button></div></form></div> : null}
       </div>
     </PatientLayout>
   );

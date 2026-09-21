@@ -8,33 +8,49 @@ import {
   ShieldAlert,
   Sparkles,
   UserRound,
+  Users,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import AccessibilityPanel from "./AccessibilityPanel";
 import { useAppSettings } from "../../context/AppSettingsContext";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 import AyuDeeLogo from "../brand/AyuDeeLogo";
+import ReminderMonitor from "./ReminderMonitor";
+import ConnectionStatus from "./ConnectionStatus";
 
 const navItems = [
-  { to: "/patient", label: "Dashboard", icon: House },
-  { to: "/patient/memories", label: "Memory Vault", icon: Sparkles },
-  { to: "/patient/games", label: "Brain Studio", icon: Brain },
-  { to: "/patient/today", label: "Today", icon: CalendarClock },
-  { to: "/patient/reminders", label: "Reminders", icon: CalendarClock },
-  { to: "/patient/companion", label: "AI Companion", icon: MessageSquareText },
-  { to: "/patient/help", label: "Help & Safety", icon: ShieldAlert },
+  { to: "/patient", label: "dashboard", icon: House },
+  { to: "/patient/memories", label: "memoryVault", icon: Sparkles },
+  { to: "/patient/games", label: "brainStudio", icon: Brain },
+  { to: "/patient/today", label: "today", icon: CalendarClock },
+  { to: "/patient/mood", label: "mood", icon: HeartHandshake },
+  { to: "/patient/family", label: "familyCircle", icon: Users },
+  { to: "/patient/consultations", label: "consultations", icon: CalendarClock },
+  { to: "/patient/reminders", label: "reminders", icon: CalendarClock },
+  { to: "/patient/companion", label: "aiCompanion", icon: MessageSquareText },
+  { to: "/patient/help", label: "helpSafety", icon: ShieldAlert },
+];
+
+const mobileNavItems = [
+  navItems[0],
+  navItems[2],
+  navItems[5],
+  navItems[1],
+  { to: "/patient/profile", label: "profile", icon: UserRound },
 ];
 
 export default function PatientLayout({ children, title, subtitle }) {
   const { largeText, highContrast } = useAppSettings();
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const firstName = user?.name?.split(" ")[0] || "Friend";
 
   return (
     <div className={`${largeText ? "large-text" : ""} ${highContrast ? "high-contrast" : ""} app-page text-slate-800`}>
       <div className="flex min-h-screen gap-0">
-        <aside className="hidden w-80 shrink-0 bg-[linear-gradient(155deg,#041F33_0%,#062A45_60%,#087EA4_150%)] p-7 text-white shadow-[12px_0_35px_rgba(4,31,51,0.16)] lg:flex lg:flex-col">
+        <aside className="patient-sidebar-visual hidden w-80 shrink-0 p-7 text-white shadow-[12px_0_35px_rgba(4,31,51,0.16)] lg:flex lg:flex-col">
           <div className="mb-8">
             <AyuDeeLogo variant="light" />
           </div>
@@ -53,7 +69,7 @@ export default function PatientLayout({ children, title, subtitle }) {
                 }
               >
                 <Icon size={18} />
-                {label}
+                {t(label)}
               </NavLink>
             ))}
           </nav>
@@ -62,9 +78,9 @@ export default function PatientLayout({ children, title, subtitle }) {
             <div className="rounded-xl bg-white/10 p-4 ring-1 ring-white/10">
               <div className="mb-2 flex items-center gap-2 text-sky-100">
                 <HeartHandshake size={18} />
-                <span className="font-semibold">Support</span>
+                <span className="font-semibold">{t("support")}</span>
               </div>
-              <p className="text-sm text-sky-100/80">A reassuring check-in is always within reach for you and your caregiver.</p>
+              <p className="text-sm text-sky-100/80">{t("supportMessage")}</p>
             </div>
             <AccessibilityPanel />
           </div>
@@ -77,12 +93,12 @@ export default function PatientLayout({ children, title, subtitle }) {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">{firstName}</p>
-                  <p className="text-[11px] text-sky-100/70">Patient</p>
+                  <p className="text-[11px] text-sky-100/70">{t("patient")}</p>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-1">
-                <NavLink to="/patient/profile" className="text-xs font-semibold text-sky-100">Profile</NavLink>
-                <button type="button" onClick={() => { logout(); navigate("/"); }} className="text-xs font-semibold text-sky-100">Log out</button>
+                <NavLink to="/patient/profile" className="text-xs font-semibold text-sky-100">{t("profile")}</NavLink>
+                <button type="button" onClick={() => { logout(); navigate("/"); }} className="text-xs font-semibold text-sky-100">{t("logOut")}</button>
               </div>
             </div>
           </div>
@@ -92,18 +108,19 @@ export default function PatientLayout({ children, title, subtitle }) {
           <header className="border-b border-[#d6edf3] bg-white/75 px-5 py-6 backdrop-blur-sm lg:px-12">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#087EA4]">Patient space / {title}</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#087EA4]">{t("patientSpace")} / {title}</p>
                 <h1 className="mt-2 text-4xl font-black tracking-tight text-[#062A45]">{title}</h1>
                 {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
+                <ConnectionStatus />
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#edf7ff] px-3 py-2 text-sm font-medium text-[#146c94]">
                   <BellRing size={16} />
-                  3 updates
+                  3 {t("updates")}
                 </div>
                 <NavLink to="/patient/help" className="inline-flex items-center gap-2 rounded-full bg-[#0b3b66] px-3 py-2 text-sm font-semibold text-white shadow-sm">
-                  <ShieldAlert size={16} /> Need help?
+                  <ShieldAlert size={16} /> {t("needHelp")}
                 </NavLink>
               </div>
             </div>
@@ -114,8 +131,8 @@ export default function PatientLayout({ children, title, subtitle }) {
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#dceeff] bg-white/90 px-2 py-2 shadow-[0_-10px_30px_rgba(11,59,102,0.08)] backdrop-blur-sm lg:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
-          {navItems.slice(0, 3).map(({ to, label, icon: Icon }) => (
+        <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+          {mobileNavItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -126,11 +143,12 @@ export default function PatientLayout({ children, title, subtitle }) {
               }
             >
               <Icon size={18} />
-              {label}
+                {t(label)}
             </NavLink>
           ))}
         </div>
       </nav>
+      <ReminderMonitor />
     </div>
   );
 }

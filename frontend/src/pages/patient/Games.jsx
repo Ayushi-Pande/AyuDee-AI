@@ -59,6 +59,14 @@ const GAME_LIBRARY = [
     description: "Read a few everyday words, then recall them gently.",
     accent: "from-teal-500 to-emerald-400",
   },
+  {
+    id: "picture-recall",
+    name: "Picture Recall",
+    difficulty: "Easy",
+    duration: "2 min",
+    description: "Remember familiar everyday pictures, then find them again.",
+    accent: "from-rose-500 to-orange-400",
+  },
 ];
 
 const MEMORY_SYMBOLS = [
@@ -85,6 +93,16 @@ const PATTERN_COLORS = [
 
 const COLOR_OPTIONS = ["Blue", "Teal", "Coral", "Amber"];
 const WORD_BANK = ["Garden", "Lantern", "Coffee", "River", "Family", "Morning", "Book", "Music"];
+const PICTURE_BANK = [
+  { id: "apple", symbol: "🍎", label: "Apple" },
+  { id: "flower", symbol: "🌼", label: "Flower" },
+  { id: "home", symbol: "🏠", label: "Home" },
+  { id: "cup", symbol: "☕", label: "Cup" },
+  { id: "book", symbol: "📖", label: "Book" },
+  { id: "tree", symbol: "🌳", label: "Tree" },
+  { id: "music", symbol: "🎵", label: "Music" },
+  { id: "clock", symbol: "🕰️", label: "Clock" },
+];
 
 function shuffleSequence(level) {
   return Array.from({ length: level }, (_, index) => index + 1).sort(() => Math.random() - 0.5);
@@ -129,6 +147,12 @@ export default function PatientGames() {
   const [wordSelected, setWordSelected] = useState([]);
   const [wordScore, setWordScore] = useState(0);
   const [wordMessage, setWordMessage] = useState("Watch the words, then choose what you remember.");
+  const [pictureItems, setPictureItems] = useState([]);
+  const [pictureChoices, setPictureChoices] = useState([]);
+  const [pictureVisible, setPictureVisible] = useState(false);
+  const [pictureSelected, setPictureSelected] = useState([]);
+  const [pictureScore, setPictureScore] = useState(null);
+  const [pictureMessage, setPictureMessage] = useState("Remember the pictures, then choose what you saw.");
   useEffect(() => {
     const saved = Number(localStorage.getItem("ayudee-pattern-best") || 0);
     setPatternBest(saved);
@@ -223,6 +247,10 @@ export default function PatientGames() {
   }, [selectedGame]);
 
   useEffect(() => {
+    if (selectedGame.id === "picture-recall" && pictureItems.length === 0) startPictureRound();
+  }, [selectedGame]);
+
+  useEffect(() => {
     if (selectedGame.id === "word-recall" && wordWords.length === 0) {
       startWordRound();
     }
@@ -238,6 +266,25 @@ export default function PatientGames() {
     setWordMessage("Remember these words...");
     window.setTimeout(() => { setWordVisible(false); setWordMessage("Which words did you see?"); }, 3500);
   }
+
+  function startPictureRound() {
+    const items = [...PICTURE_BANK].sort(() => Math.random() - 0.5).slice(0, 4);
+    const choices = [...items, ...PICTURE_BANK.filter((item) => !items.some((selected) => selected.id === item.id)).slice(0, 4)].sort(() => Math.random() - 0.5);
+    setPictureItems(items);
+    setPictureChoices(choices);
+    setPictureSelected([]);
+    setPictureScore(null);
+    setPictureVisible(true);
+    setPictureMessage("Remember these pictures...");
+    window.setTimeout(() => { setPictureVisible(false); setPictureMessage("Which pictures did you see?"); }, 3500);
+  }
+
+  const checkPictureAnswer = async () => {
+    const score = pictureSelected.filter((id) => pictureItems.some((item) => item.id === id)).length;
+    setPictureScore(score);
+    setPictureMessage(`You remembered ${score} of ${pictureItems.length} pictures.`);
+    await apiService.createGameResult({ patient_id: "patient-001", game_name: "Picture Recall", score, attempts: pictureItems.length, completed: true }).catch(() => undefined);
+  };
 
   const handleWordChoice = async (word) => {
     if (wordSelected.includes(word) || wordVisible) return;
@@ -447,6 +494,17 @@ export default function PatientGames() {
       );
     }
 
+    if (selectedGame.id === "picture-recall") {
+      return (
+        <div className="space-y-5">
+          <div className="rounded-2xl bg-rose-50 p-4 text-sm font-medium text-rose-800">{pictureMessage}</div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{(pictureVisible ? pictureItems : pictureChoices).map((item) => <button key={item.id} type="button" disabled={pictureVisible || pictureScore !== null} onClick={() => setPictureSelected((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} className={`flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl border text-center transition ${pictureVisible || pictureSelected.includes(item.id) ? "border-rose-200 bg-rose-50 text-rose-800" : "border-slate-200 bg-slate-50 text-slate-700 hover:border-rose-300"} ${pictureSelected.includes(item.id) ? "ring-2 ring-rose-400" : ""}`}><span className="text-4xl">{item.symbol}</span><span className="text-sm font-bold">{item.label}</span></button>)}</div>
+          {pictureScore !== null ? <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800"><p className="text-lg font-black">Score: {pictureScore}/{pictureItems.length}</p><p className="mt-1 text-sm">Great work. Try another round when you are ready.</p></div> : null}
+          <div className="flex flex-wrap gap-3"><button type="button" disabled={pictureVisible || !pictureSelected.length} onClick={checkPictureAnswer} className="rounded-full bg-rose-600 px-4 py-2.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">Check answer</button><button type="button" onClick={startPictureRound} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 font-semibold text-slate-700"><RotateCcw size={16} /> New round</button></div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-5">
         <div className="rounded-2xl bg-emerald-50 p-4 text-sm font-medium text-emerald-800 ring-1 ring-emerald-100">
@@ -487,7 +545,7 @@ export default function PatientGames() {
 
         <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
           <div className="premium-card p-5">
-            <SectionHeader title="Choose an activity" subtitle="Four ways to keep your attention engaged." />
+            <SectionHeader title="Choose an activity" subtitle="Seven ways to keep your attention engaged." />
             <div className="space-y-3">
               {GAME_LIBRARY.map((game) => (
                 <button

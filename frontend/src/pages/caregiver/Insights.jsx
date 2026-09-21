@@ -1,4 +1,5 @@
 import { Activity, BarChart3, BrainCircuit, CalendarClock, HeartPulse, Sparkles } from "lucide-react";
+import { useState } from "react";
 import {
   Area,
   AreaChart,
@@ -40,8 +41,17 @@ const timelineData = [
 ];
 
 export default function CaregiverInsights() {
+  const [moodHistory] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("ayudee-mood-history") || "[]");
+      return Array.isArray(stored) ? stored.slice(-7).reverse() : [];
+    } catch {
+      return [];
+    }
+  });
+
   return (
-    <CaregiverLayout title="Insights" subtitle="Behavioral summaries for support planning and routine monitoring.">
+    <CaregiverLayout title="Insights" subtitle="Neutral activity summaries for support planning and routine monitoring.">
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {insightCards.map(({ label, value, detail, icon: Icon }) => (
@@ -57,6 +67,11 @@ export default function CaregiverInsights() {
             </div>
           ))}
         </div>
+
+        <section className="rounded-[28px] border border-[#d8ebff] bg-white p-5 shadow-[0_18px_40px_rgba(11,59,102,0.08)]">
+          <div className="flex items-center gap-3"><HeartPulse className="text-[#146c94]" size={22} /><div><h2 className="text-2xl font-black text-[#102a43]">Mood history</h2><p className="text-sm text-slate-500">Recent check-ins shared from the patient device.</p></div></div>
+          {moodHistory.length ? <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">{moodHistory.map((entry) => <div key={entry.date} className="rounded-2xl bg-[#f7fbff] p-3 text-center"><p className="text-2xl">{{ happy: "😊", good: "🙂", okay: "😐", low: "😔", anxious: "😟" }[entry.mood] || "•"}</p><p className="mt-2 text-xs font-bold capitalize text-[#146c94]">{entry.mood}</p><p className="mt-1 text-[10px] text-slate-400">{entry.date.slice(5)}</p></div>)}</div> : <p className="mt-5 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">No mood check-ins have been recorded yet.</p>}
+        </section>
 
         <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
           <section className="rounded-[28px] border border-[#d8ebff] bg-white p-5 shadow-[0_18px_40px_rgba(11,59,102,0.08)]">

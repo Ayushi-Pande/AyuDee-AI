@@ -11,24 +11,29 @@ import { NavLink, useNavigate } from "react-router-dom";
 import AccessibilityPanel from "./AccessibilityPanel";
 import { useAppSettings } from "../../context/AppSettingsContext";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 import AyuDeeLogo from "../brand/AyuDeeLogo";
+import PinGate from "./PinGate";
+import ConnectionStatus from "./ConnectionStatus";
 
 const navItems = [
-  { to: "/caregiver", label: "Overview", icon: House },
-  { to: "/caregiver/memories", label: "Memory Library", icon: FileHeart },
-  { to: "/caregiver/reminders", label: "Care Plan", icon: CalendarClock },
-  { to: "/caregiver/games", label: "Brain Activity", icon: BarChart3 },
-  { to: "/caregiver/insights", label: "Insights", icon: BarChart3 },
-  { to: "/caregiver/connect", label: "Connection", icon: Users },
+  { to: "/caregiver", label: "overview", icon: House },
+  { to: "/caregiver/memories", label: "memoryLibrary", icon: FileHeart },
+  { to: "/caregiver/reminders", label: "carePlan", icon: CalendarClock },
+  { to: "/caregiver/games", label: "brainActivity", icon: BarChart3 },
+  { to: "/caregiver/insights", label: "insights", icon: BarChart3 },
+  { to: "/caregiver/connect", label: "connection", icon: Users },
 ];
 
 export default function CaregiverLayout({ children, title, subtitle }) {
   const { largeText, highContrast } = useAppSettings();
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const firstName = user?.name?.split(" ")[0] || "Caregiver";
 
   return (
+    <PinGate>
     <div className={`${largeText ? "large-text" : ""} ${highContrast ? "high-contrast" : ""} app-page text-slate-800`}>
       <div className="flex min-h-screen gap-0">
         <aside className="hidden w-80 shrink-0 bg-[linear-gradient(155deg,#041F33_0%,#062A45_60%,#087EA4_150%)] p-7 text-white shadow-[12px_0_35px_rgba(4,31,51,0.16)] lg:flex lg:flex-col">
@@ -48,7 +53,7 @@ export default function CaregiverLayout({ children, title, subtitle }) {
                 }
               >
                 <Icon size={18} />
-                {label}
+                {t(label)}
               </NavLink>
             ))}
           </nav>
@@ -57,9 +62,9 @@ export default function CaregiverLayout({ children, title, subtitle }) {
             <div className="rounded-[22px] bg-white/8 p-4 ring-1 ring-white/10 backdrop-blur-sm">
               <div className="mb-2 flex items-center gap-2 text-sky-100">
                 <Users size={18} />
-                <span className="font-semibold">Patient overview</span>
+                <span className="font-semibold">{t("patientOverview")}</span>
               </div>
-              <p className="text-sm text-sky-100/80">Support patterns look steady and engagement is improving this week.</p>
+              <p className="text-sm text-sky-100/80">{t("caregiverOverviewMessage")}</p>
             </div>
             <AccessibilityPanel />
           </div>
@@ -72,12 +77,12 @@ export default function CaregiverLayout({ children, title, subtitle }) {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">{firstName}</p>
-                  <p className="text-[11px] text-sky-100/70">Caregiver</p>
+                  <p className="text-[11px] text-sky-100/70">{t("caregiver")}</p>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-1">
-                <NavLink to="/caregiver/profile" className="text-xs font-semibold text-sky-100">Profile</NavLink>
-                <button type="button" onClick={() => { logout(); navigate("/"); }} className="text-xs font-semibold text-sky-100">Log out</button>
+                <NavLink to="/caregiver/profile" className="text-xs font-semibold text-sky-100">{t("profile")}</NavLink>
+                <button type="button" onClick={() => { logout(); navigate("/"); }} className="text-xs font-semibold text-sky-100">{t("logOut")}</button>
               </div>
             </div>
           </div>
@@ -87,18 +92,19 @@ export default function CaregiverLayout({ children, title, subtitle }) {
           <header className="border-b border-[#d6edf3] bg-white/75 px-5 py-6 backdrop-blur-sm lg:px-12">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#087EA4]">Caregiver console / {title}</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#087EA4]">{t("caregiverConsole")} / {title}</p>
                 <h1 className="mt-2 text-4xl font-black tracking-tight text-[#062A45]">{title}</h1>
                 {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
+                <ConnectionStatus />
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#edf7ff] px-3 py-2 text-sm font-medium text-[#146c94]">
                   <BellRing size={16} />
-                  2 alerts
+                  2 {t("alerts")}
                 </div>
                 <NavLink to="/caregiver/memories" className="rounded-full bg-[#0b3b66] px-3 py-2 text-sm font-semibold text-white shadow-sm">
-                  + New note
+                  + {t("newNote")}
                 </NavLink>
               </div>
             </div>
@@ -121,11 +127,12 @@ export default function CaregiverLayout({ children, title, subtitle }) {
               }
             >
               <Icon size={16} />
-              {label}
+                {t(label)}
             </NavLink>
           ))}
         </div>
       </nav>
     </div>
+    </PinGate>
   );
 }
