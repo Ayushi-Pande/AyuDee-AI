@@ -2,7 +2,7 @@
 
 # 🧠💙 AyuDee AI
 
-### *Care That Remembers With You.*
+**Where Help Meets care**
 
 **An AI-Powered Cognitive Care & Memory Support Platform**
 
